@@ -1,21 +1,12 @@
 package com.example.politica_negocio.model;
 
-import jakarta.persistence.*;
 import lombok.Data;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "\"Log Diagrama\"")
 @Data
 public class LogDiagrama {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private LocalDateTime tiempo;
 
-    @Column(name = "\"JSON\"", columnDefinition = "TEXT")
     private String json;
-
-    @Column(name = "\"tiempo\"")
-    private LocalTime tiempo;
 }

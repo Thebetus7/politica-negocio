@@ -1,21 +1,20 @@
 package com.example.politica_negocio.model;
 
-import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.annotation.Id;
 
-@Entity
-@Table(name = "\"Usuario\"")
+@Document(collection = "usuarios")
 @Data
 public class Usuario {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    // Campos dummy para prueba de login rapido. La bd.md no los incluye pero se asume nombre o email
-    @Column(name = "username",  columnDefinition = "TEXT")
+    @NotBlank(message = "Username no puede estar vacío")
     private String username;
 
-    @Column(name = "password",  columnDefinition = "TEXT")
+    @NotBlank(message = "Password no puede estar vacío")
     private String password;
 }

@@ -1,23 +1,26 @@
 package com.example.politica_negocio.model;
 
-import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.annotation.Id;
+import java.util.ArrayList;
+import java.util.List;
 
-@Entity
-@Table(name = "\"Política Negocio\"")
+@Document(collection = "politicasNegocio")
 @Data
 public class PoliticaNegocio {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    @Column(name = "\"nombre\"", columnDefinition = "TEXT")
+    @NotBlank(message = "Nombre no puede estar vacío")
     private String nombre;
 
-    @Column(name = "\"descripcion\"", columnDefinition = "TEXT")
     private String descripcion;
 
-    @Column(name = "\"estado\"", columnDefinition = "TEXT")
+    @NotBlank(message = "Estado no puede estar vacío")
     private String estado;
+    
+    private List<LogDiagrama> logs = new ArrayList<>();
 }
