@@ -154,7 +154,7 @@ cd "c:\EDBERTO\ULT SEMESTRE\SW1\1ER parcial\SW1_PN_1_2026\politica-negocio"
 
 # La aplicación debería mostrar:
 # ============================
-# Tomcat started on port(s): 8080 (http)
+# Tomcat started on port(s): 8081 (http)
 # ...
 # ✅ Seed: Usuario admin creado.
 # ✅ Seed: Política inicial creada.
