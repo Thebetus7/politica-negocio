@@ -1,19 +1,15 @@
 package com.example.politica_negocio.repository;
 
-import com.example.politica_negocio.model.Usuario;
+import com.example.politica_negocio.model.Departamento;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
-public interface UsuarioRepository extends MongoRepository<Usuario, String> {
-
-    @Query("{ 'correo' : ?0, 'deletedAt' : null }")
-    Optional<Usuario> findByCorreo(String correo);
+public interface DepartamentoRepository extends MongoRepository<Departamento, String> {
 
     @Query("{ 'deletedAt' : null }")
-    List<Usuario> findAllActive();
+    List<Departamento> findAllActive();
 }
