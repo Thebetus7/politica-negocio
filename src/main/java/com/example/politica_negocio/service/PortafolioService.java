@@ -26,4 +26,15 @@ public class PortafolioService {
         portafolio.setCreatedAt(LocalDateTime.now());
         return repository.save(portafolio);
     }
+
+    public Portafolio update(String id, Portafolio portafolio) {
+        return repository.findById(id)
+                .filter(p -> p.getDeletedAt() == null)
+                .map(existing -> {
+                    existing.setJson(portafolio.getJson());
+                    existing.setUpdatedAt(LocalDateTime.now());
+                    return repository.save(existing);
+                })
+                .orElse(null);
+    }
 }

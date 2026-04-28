@@ -6,17 +6,16 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @EqualsAndHashCode(callSuper = true)
-@Document(collection = "portafolios")
+@Document(collection = "funcionariosDepa")
 @Data
-public class Portafolio extends BaseEntity {
+public class FuncionarioDepa extends BaseEntity {
 
     @Id
     private String id;
 
-    /**
-     * JSON en formato String que guarda solo texto:
-     * carnet, nota, descripcion y otros datos.
-     * Sin imágenes.
-     */
-    private String json;
+    /** ID del usuario con rol FUNCIONARIO */
+    private String userId;
+
+    /** ID del departamento asignado */
+    private String departamentoId;
 }
