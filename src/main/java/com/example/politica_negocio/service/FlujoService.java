@@ -11,7 +11,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class FlujoService {
-
     private final FlujoRepository repository;
 
     public List<Flujo> getByPoliticaId(String politicaId) {
@@ -48,4 +47,5 @@ public class FlujoService {
                 })
                 .orElse(null);
     }
+
 }

@@ -12,11 +12,15 @@ import java.util.List;
 @RequestMapping("/api/politicas")
 @RequiredArgsConstructor
 public class PoliticaNegocioController {
-
     private final PoliticaNegocioService service;
 
     @GetMapping
     public ResponseEntity<List<PoliticaNegocio>> getAll() {
+        return ResponseEntity.ok(service.getAll());
+    }
+
+    @GetMapping("/public")
+    public ResponseEntity<List<PoliticaNegocio>> getAllPublic() {
         return ResponseEntity.ok(service.getAll());
     }
 

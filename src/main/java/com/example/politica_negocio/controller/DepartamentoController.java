@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/departamentos")
@@ -18,6 +19,17 @@ public class DepartamentoController {
     @GetMapping
     public ResponseEntity<List<Departamento>> getAll() {
         return ResponseEntity.ok(service.getAll());
+    }
+
+    @GetMapping("/selector")
+    public ResponseEntity<List<Map<String, String>>> getForSelector() {
+        List<Map<String, String>> data = service.getAll().stream()
+                .map(dep -> Map.of(
+                        "id", dep.getId(),
+                        "nombre", dep.getNombre() == null ? "" : dep.getNombre()
+                ))
+                .toList();
+        return ResponseEntity.ok(data);
     }
 
     @PostMapping

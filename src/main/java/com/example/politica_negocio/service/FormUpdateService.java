@@ -28,6 +28,8 @@ public class FormUpdateService {
                 .filter(f -> f.getDeletedAt() == null)
                 .map(existing -> {
                     existing.setContenidoUpdate(formUpdate.getContenidoUpdate());
+                    existing.setFormularioId(formUpdate.getFormularioId());
+                    existing.setActividadId(formUpdate.getActividadId());
                     existing.setUpdatedAt(LocalDateTime.now());
                     return repository.save(existing);
                 })
