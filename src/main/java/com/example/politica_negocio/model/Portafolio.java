@@ -19,4 +19,10 @@ public class Portafolio extends BaseEntity {
      * Sin imágenes.
      */
     private String json;
+
+    private String politicaId;
+    
+    private String creadorId;
+    
+    private String estado;
 }

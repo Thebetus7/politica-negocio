@@ -14,7 +14,11 @@ public class FlujoService {
     private final FlujoRepository repository;
 
     public List<Flujo> getByPoliticaId(String politicaId) {
-        return repository.findByPoliticaId(politicaId);
+        return repository.findPlantillasByPoliticaId(politicaId);
+    }
+
+    public List<Flujo> getByPoliticaAndPortafolioId(String politicaId, String portafolioId) {
+        return repository.findInstanciasByPoliticaIdAndPortafolioId(politicaId, portafolioId);
     }
 
     public List<Flujo> getByActividadId(String actividadId) {

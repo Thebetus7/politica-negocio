@@ -33,6 +33,10 @@ public class Actividad extends BaseEntity {
     /** Posición Y del nodo en el canvas del editor */
     private String ejeY;
 
+    /** Dimensiones del nodo (para regiones y nodos redimensionables) */
+    private String width;
+    private String height;
+
     /** Tipo de nodo: actividad, decision, while_do, do_while, fork, join, inicio, fin */
     private String tipoNodo;
 }

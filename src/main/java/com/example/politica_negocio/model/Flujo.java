@@ -20,6 +20,13 @@ public class Flujo extends BaseEntity {
     private String actividadId;
 
     /**
+     * Referencia al Trámite (Portafolio). 
+     * Si es null, el flujo es la plantilla de la Política. 
+     * Si tiene valor, es la instancia en ejecución para un Trámite.
+     */
+    private String portafolioId;
+
+    /**
      * JSON con la lógica de rutas y flujo de ejecución.
      * Cuando un funcionario completa su FormUpdate, el sistema consulta
      * este campo para determinar cuál nodo activar a continuación.

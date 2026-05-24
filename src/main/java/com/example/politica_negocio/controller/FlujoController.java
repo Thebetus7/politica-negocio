@@ -16,7 +16,12 @@ public class FlujoController {
     private final FlujoService service;
 
     @GetMapping
-    public ResponseEntity<List<Flujo>> getByPolitica(@PathVariable String politicaId) {
+    public ResponseEntity<List<Flujo>> getByPolitica(
+            @PathVariable String politicaId,
+            @RequestParam(required = false) String portafolioId) {
+        if (portafolioId != null && !portafolioId.isEmpty()) {
+            return ResponseEntity.ok(service.getByPoliticaAndPortafolioId(politicaId, portafolioId));
+        }
         return ResponseEntity.ok(service.getByPoliticaId(politicaId));
     }
 

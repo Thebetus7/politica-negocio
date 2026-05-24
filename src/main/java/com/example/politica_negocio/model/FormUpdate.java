@@ -24,4 +24,7 @@ public class FormUpdate extends BaseEntity {
 
     /** Referencia a la Actividad donde se usa este formulario */
     private String actividadId;
+    
+    /** Referencia al Trámite (Portafolio) al que pertenece esta captura de datos */
+    private String portafolioId;
 }

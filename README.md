@@ -6,7 +6,13 @@ Servidor de API REST para la gestión de políticas de negocio, diagramas y aute
 - **Java 17**
 - **MongoDB** (Puerto 27017)
 
-## 🐳 Base de Datos con Docker (Recomendado)
+## 🍃 MongoDB local (sin Docker)
+
+Guía completa de instalación en Windows, conexión, reset, inspección de datos y rutas en disco:
+
+**[README_MONGODB_LOCAL.md](./README_MONGODB_LOCAL.md)**
+
+## 🐳 Base de Datos con Docker (alternativa)
 Si tienes **Docker Desktop** instalado y abierto, puedes levantar MongoDB con este comando:
 
 ```bash
