@@ -26,7 +26,7 @@ public class Formulario extends BaseEntity {
     /**
      * Estructura JSON del formulario.
      * Cada elemento es un Map con las propiedades del campo:
-     * - tipo: "texto" | "texto_largo" | "numero" | "fecha" | "lista" | "checkbox" | "radio" | "archivo" | "email" | "telefono"
+     * - tipo: "texto" | "texto_largo" | "numero" | "fecha" | "lista" | "checkbox" | "radio" | "boton" | "email" | "archivo" | "telefono"
      * - etiqueta: nombre visible del campo
      * - placeholder: texto de ejemplo
      * - requerido: boolean
