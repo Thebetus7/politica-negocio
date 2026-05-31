@@ -57,6 +57,7 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/health").permitAll()
                 .requestMatchers("/api/politicas/public").permitAll()
                 .requestMatchers("/ws-diagram/**").permitAll()
                 .anyRequest().authenticated()

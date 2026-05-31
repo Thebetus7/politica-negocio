@@ -18,4 +18,7 @@ public interface FlujoRepository extends MongoRepository<Flujo, String> {
 
     @Query("{ 'actividadId': ?0, 'deletedAt': null }")
     List<Flujo> findByActividadId(String actividadId);
+
+    @Query("{ '$or': [ { 'actividadId': ?0 }, { 'proceso.siguientes.actividadDestinoId': ?0 } ], 'deletedAt': null }")
+    List<Flujo> findActiveByActividadAsSourceOrTarget(String actividadId);
 }

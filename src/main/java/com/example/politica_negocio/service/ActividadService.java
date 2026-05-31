@@ -1,7 +1,9 @@
 package com.example.politica_negocio.service;
 
 import com.example.politica_negocio.model.Actividad;
+import com.example.politica_negocio.model.Flujo;
 import com.example.politica_negocio.repository.ActividadRepository;
+import com.example.politica_negocio.repository.FlujoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +15,7 @@ import java.util.List;
 public class ActividadService {
 
     private final ActividadRepository repository;
+    private final FlujoRepository flujoRepository;
 
     public List<Actividad> getByPoliticaId(String politicaId) {
         return repository.findByPoliticaIdAndDeletedAtIsNull(politicaId);
@@ -52,8 +55,17 @@ public class ActividadService {
                 .filter(a -> a.getDeletedAt() == null)
                 .map(existing -> {
                     existing.setDeletedAt(LocalDateTime.now());
+                    softDeleteAssociatedFlujos(existing.getId());
                     return repository.save(existing);
                 })
                 .orElse(null);
+    }
+
+    private void softDeleteAssociatedFlujos(String actividadId) {
+        List<Flujo> associatedFlujos = flujoRepository.findActiveByActividadAsSourceOrTarget(actividadId);
+        for (Flujo flujo : associatedFlujos) {
+            flujo.setDeletedAt(LocalDateTime.now());
+            flujoRepository.save(flujo);
+        }
     }
 }

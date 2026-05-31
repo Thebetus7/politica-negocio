@@ -2,6 +2,7 @@ package com.example.politica_negocio.controller;
 
 import com.example.politica_negocio.model.LogDiagrama;
 import com.example.politica_negocio.repository.LogDiagramaRepository;
+import com.example.politica_negocio.service.LogPoliticaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -16,6 +17,7 @@ import java.util.Map;
 public class DiagramController {
 
     private final LogDiagramaRepository logDiagramaRepository;
+    private final LogPoliticaService logPoliticaService;
 
     /**
      * WebSocket: Recibe actualizaciones del diagrama y las retransmite
@@ -33,7 +35,9 @@ public class DiagramController {
         log.setJson(diagramData);
         log.setCreatedAt(LocalDateTime.now());
         logDiagramaRepository.save(log);
-        
+
+        logPoliticaService.compileAndSaveIfValidAsync(politicaId);
+
         return diagramData;
     }
 
