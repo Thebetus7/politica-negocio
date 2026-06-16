@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="Actividad" type="Actividad"/>
+	<xs:complexType name="Actividad">
+		<xs:sequence>
+			<xs:element name="id" type="xs:int" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="id_politica" type="xs:int" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="id_depa" type="xs:int" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="id_actividad" type="xs:int" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="id_form_update" type="xs:int" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="estado" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="eje_x" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="eje_y" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="Departamento" type="Departamento" minOccurs="1" maxOccurs="unbounded"/>
+			<xs:element name="AdminDiagrama" type="AdminDiagrama" minOccurs="1" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="AdminDiagrama" type="AdminDiagrama"/>
+	<xs:complexType name="AdminDiagrama">
+		<xs:sequence>
+			<xs:element name="id" type="xs:int" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="id_politica" type="xs:int" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="id_log_diag" type="xs:int" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="id_user" type="xs:int" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="id_portafolio" type="xs:int" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="Politica Negocio" type="Politica Negocio" minOccurs="1" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="Colaborador" type="Colaborador"/>
+	<xs:complexType name="Colaborador">
+		<xs:sequence>
+			<xs:element name="id" type="xs:int" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="id_admin_colab" type="xs:int" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="id_politica" type="xs:int" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="estado" type="xs:int" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="Usuario" type="Usuario" minOccurs="1" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="Departamento" type="Departamento"/>
+	<xs:complexType name="Departamento">
+		<xs:sequence>
+			<xs:element name="id" type="xs:int" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="nombre" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="descripcion" type="xs:int" minOccurs="1" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="Flujo" type="Flujo"/>
+	<xs:complexType name="Flujo">
+		<xs:sequence>
+			<xs:element name="id" type="xs:int" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="id_politica" type="xs:int" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="id_actividad" type="xs:int" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="proceso" type="xs:string" minOccurs="1" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="Formulario" type="Formulario"/>
+	<xs:complexType name="Formulario">
+		<xs:sequence>
+			<xs:element name="id" type="xs:int" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="json" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="FormUpdate" type="FormUpdate" minOccurs="1" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="FormUpdate" type="FormUpdate"/>
+	<xs:complexType name="FormUpdate">
+		<xs:sequence>
+			<xs:element name="id" type="xs:int" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="contenido_udpate" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="id_form" type="xs:int" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="Actividad" type="Actividad" minOccurs="1" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="FuncionarioDepa" type="FuncionarioDepa"/>
+	<xs:complexType name="FuncionarioDepa">
+		<xs:sequence>
+			<xs:element name="id" type="xs:int" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="id_user" type="xs:int" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="id_depa" type="xs:int" minOccurs="1" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="Log Diagram" type="Log Diagram"/>
+	<xs:complexType name="Log Diagram">
+		<xs:sequence>
+			<xs:element name="id" type="xs:int" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="json" type="xs:int" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="AdminDiagrama" type="AdminDiagrama" minOccurs="1" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="Politica Negocio" type="Politica Negocio"/>
+	<xs:complexType name="Politica Negocio">
+		<xs:sequence>
+			<xs:element name="id" type="xs:int" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="nombre" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="descripcion" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="Colaborador" type="Colaborador" minOccurs="1" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="Portafolio" type="Portafolio"/>
+	<xs:complexType name="Portafolio">
+		<xs:sequence>
+			<xs:element name="id" type="xs:int" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="json" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="AdminDiagrama" type="AdminDiagrama" minOccurs="1" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="Usuario" type="Usuario"/>
+	<xs:complexType name="Usuario">
+		<xs:sequence>
+			<xs:element name="id" type="xs:int" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="correo" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="contra" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="Departamento" type="Departamento" minOccurs="1" maxOccurs="unbounded"/>
+			<xs:element name="AdminDiagrama" type="AdminDiagrama" minOccurs="1" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

@@ -15,4 +15,10 @@ public interface FormUpdateRepository extends MongoRepository<FormUpdate, String
 
     @Query("{ 'formularioId': ?0, 'deletedAt': null }")
     List<FormUpdate> findByFormularioId(String formularioId);
+
+    @Query("{ 'portafolioId': ?0, 'deletedAt': null }")
+    List<FormUpdate> findByPortafolioId(String portafolioId);
+
+    @Query("{ 'portafolioId': ?0, 'actividadId': ?1, 'deletedAt': null }")
+    List<FormUpdate> findByPortafolioIdAndActividadId(String portafolioId, String actividadId);
 }

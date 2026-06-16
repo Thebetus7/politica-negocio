@@ -173,6 +173,130 @@ class LogPoliticaServiceTest {
     }
 
     @Test
+    void compile_decisionAmbasRamasFin_esInvalido() {
+        stubFlow(
+                act("ini", "inicio", "Inicio"),
+                act("dec", "decision", "¿Valido?", "{\"condicion\":\"¿Valido?\"}"),
+                act("fin", "fin", "Fin"),
+                flujo("ini", "dec"),
+                flujoLabeled("dec", "fin", "Si"),
+                flujoLabeled("dec", "fin", "No")
+        );
+
+        LogPoliticaCompileResult result = service.compileAndSaveIfValid(POLITICA_ID);
+
+        assertFalse(result.isValido());
+        assertTrue(result.getMensaje().contains("ambas ramas"));
+    }
+
+    @Test
+    void compile_paraleloConRamaFin_esInvalido() {
+        stubFlow(
+                act("ini", "inicio", "Inicio"),
+                act("a1", "actividad", "A1"),
+                act("a2", "actividad", "A2"),
+                act("fin", "fin", "Fin"),
+                flujo("ini", "a1"),
+                flujo("a1", "a2"),
+                flujo("a1", "fin"),
+                flujo("a2", "fin")
+        );
+
+        LogPoliticaCompileResult result = service.compileAndSaveIfValid(POLITICA_ID);
+
+        assertFalse(result.isValido());
+        assertTrue(result.getMensaje().contains("paralelas"));
+    }
+
+    @Test
+    void compile_cicloSinPregunta_esInvalido() {
+        stubFlow(
+                act("ini", "inicio", "Inicio"),
+                act("a1", "actividad", "A1"),
+                act("a2", "actividad", "A2"),
+                act("a3", "actividad", "A3"),
+                act("fin", "fin", "Fin"),
+                flujo("ini", "a1"),
+                flujo("a1", "a2"),
+                flujo("a2", "a3"),
+                flujo("a3", "fin"),
+                flujo("a2", "a1")
+        );
+
+        LogPoliticaCompileResult result = service.compileAndSaveIfValid(POLITICA_ID);
+
+        assertFalse(result.isValido());
+        assertTrue(result.getMensaje().contains("Pregunta"));
+    }
+
+    @Test
+    void compile_mismoGrafoSinCambioPool_noCreaNuevaVersion() {
+        Actividad ini = act("ini", "inicio", "Inicio");
+        Actividad act1 = act("act1", "actividad", "Actividad");
+        Actividad fin = act("fin", "fin", "Fin");
+        stubFlow(ini, act1, fin, flujo("ini", "act1"), flujo("act1", "fin"));
+
+        LogPoliticaCompileResult first = service.compileAndSaveIfValid(POLITICA_ID);
+        assertTrue(first.isValido());
+        assertEquals(1, first.getVersion());
+
+        LogPolitica prev = new LogPolitica();
+        prev.setId("log-1");
+        prev.setPoliticaId(POLITICA_ID);
+        prev.setVersion(1);
+        prev.setValido(true);
+        prev.setFuncional(true);
+        prev.setFlujoJson(first.getFlujoJson());
+
+        when(logPoliticaRepository.findByPoliticaIdAndDeletedAtIsNullOrderByVersionDesc(POLITICA_ID))
+                .thenReturn(List.of(prev));
+        when(logPoliticaRepository.findFirstByPoliticaIdAndValidoTrueAndFuncionalTrueAndDeletedAtIsNull(POLITICA_ID))
+                .thenReturn(Optional.of(prev));
+
+        LogPoliticaCompileResult second = service.compileAndSaveIfValid(POLITICA_ID);
+
+        assertTrue(second.isValido());
+        assertEquals(1, second.getVersion());
+        verify(logPoliticaRepository, times(1)).save(any(LogPolitica.class));
+    }
+
+    @Test
+    void compile_cambioDepartamentoNodo_siCreaNuevaVersion() {
+        Actividad ini = act("ini", "inicio", "Inicio");
+        Actividad act1 = act("act1", "actividad", "Actividad");
+        act1.setDepartamentoId("dep-1");
+        Actividad fin = act("fin", "fin", "Fin");
+        stubFlow(ini, act1, fin, flujo("ini", "act1"), flujo("act1", "fin"));
+
+        LogPoliticaCompileResult first = service.compileAndSaveIfValid(POLITICA_ID);
+        assertEquals(1, first.getVersion());
+
+        LogPolitica prev = new LogPolitica();
+        prev.setId("log-1");
+        prev.setPoliticaId(POLITICA_ID);
+        prev.setVersion(1);
+        prev.setValido(true);
+        prev.setFuncional(true);
+        prev.setFlujoJson(first.getFlujoJson());
+
+        act1.setDepartamentoId("dep-2");
+        stubFlow(ini, act1, fin, flujo("ini", "act1"), flujo("act1", "fin"));
+
+        when(logPoliticaRepository.findByPoliticaIdAndDeletedAtIsNullOrderByVersionDesc(POLITICA_ID))
+                .thenReturn(List.of(prev));
+        when(logPoliticaRepository.findFirstByPoliticaIdAndValidoTrueAndFuncionalTrueAndDeletedAtIsNull(POLITICA_ID))
+                .thenReturn(Optional.of(prev));
+        when(logPoliticaRepository.findByPoliticaIdAndFuncionalTrueAndDeletedAtIsNull(POLITICA_ID))
+                .thenReturn(List.of(prev));
+
+        LogPoliticaCompileResult second = service.compileAndSaveIfValid(POLITICA_ID);
+
+        assertTrue(second.isValido());
+        assertEquals(2, second.getVersion());
+        verify(logPoliticaRepository, atLeast(2)).save(any(LogPolitica.class));
+    }
+
+    @Test
     void compile_valido_desactivaVersionAnteriorFuncional() {
         LogPolitica prev = existingLog(1);
         when(logPoliticaRepository.findByPoliticaIdAndFuncionalTrueAndDeletedAtIsNull(POLITICA_ID))

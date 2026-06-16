@@ -1,16 +1,19 @@
 package com.example.politica_negocio.service;
 
+import com.example.politica_negocio.model.LogPolitica;
 import com.example.politica_negocio.model.Portafolio;
 import com.example.politica_negocio.model.Flujo;
-import com.example.politica_negocio.repository.PortafolioRepository;
 import com.example.politica_negocio.repository.FlujoRepository;
+import com.example.politica_negocio.repository.PortafolioRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +21,8 @@ public class PortafolioService {
 
     private final PortafolioRepository repository;
     private final FlujoRepository flujoRepository;
+    private final LogPoliticaService logPoliticaService;
+    private final TramiteEngineService tramiteEngineService;
 
     public List<Portafolio> getAll() {
         return repository.findAllActive();
@@ -28,6 +33,14 @@ public class PortafolioService {
     }
 
     public Portafolio create(Portafolio portafolio) {
+        if (portafolio.getPoliticaId() == null || portafolio.getPoliticaId().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "politicaId es requerido");
+        }
+
+        LogPolitica valido = logPoliticaService.getUltimoValido(portafolio.getPoliticaId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT,
+                        "La política no tiene un flujo válido compilado. Guarde el diagrama primero."));
+
         portafolio.setCreatedAt(LocalDateTime.now());
         if (portafolio.getEstado() == null) {
             portafolio.setEstado("en_progreso");
@@ -42,22 +55,17 @@ public class PortafolioService {
                 instancia.setActividadId(plantilla.getActividadId());
                 instancia.setPortafolioId(saved.getId());
                 instancia.setCreatedAt(LocalDateTime.now());
-                
+
                 if (plantilla.getProceso() != null) {
                     Map<String, Object> procesoInstancia = new HashMap<>(plantilla.getProceso());
-                    
-                    // Solo el nodo inicial o primer orden deberia arrancar "en_progreso" (o lo manejamos en el front/siguiente paso, pero aquí los inicializamos)
-                    Object ordenObj = procesoInstancia.get("orden");
-                    if (ordenObj != null && String.valueOf(ordenObj).equals("1")) {
-                        procesoInstancia.put("estadoActual", "en_progreso");
-                    } else {
-                        procesoInstancia.put("estadoActual", "pendiente");
-                    }
+                    procesoInstancia.put("estadoActual", "pendiente");
                     instancia.setProceso(procesoInstancia);
                 }
-                
+
                 flujoRepository.save(instancia);
             }
+
+            tramiteEngineService.iniciarFlujoDesdeInicio(saved);
         }
 
         return saved;

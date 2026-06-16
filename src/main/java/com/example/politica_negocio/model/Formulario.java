@@ -8,7 +8,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import jakarta.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @EqualsAndHashCode(callSuper = true)
 @Document(collection = "formularios")
@@ -33,5 +32,5 @@ public class Formulario extends BaseEntity {
      * - opciones: List<String> (solo para lista y radio)
      * - orden: número de posición
      */
-    private List<Map<String, Object>> campos = new ArrayList<>();
+    private List<CampoFormulario> campos = new ArrayList<>();
 }

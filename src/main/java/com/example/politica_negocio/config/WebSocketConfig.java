@@ -20,9 +20,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // Endpoint al que Angular/Flutter conectará el WebSocket
+        // Endpoint al que Angular conectará el WebSocket (SockJS)
         registry.addEndpoint("/ws-diagram")
-                .setAllowedOriginPatterns("*") // Permisos libres para colaboracion abierta
+                .setAllowedOriginPatterns("*")
                 .withSockJS();
+        // Endpoint STOMP nativo para Flutter móvil
+        registry.addEndpoint("/ws-native")
+                .setAllowedOriginPatterns("*");
     }
 }

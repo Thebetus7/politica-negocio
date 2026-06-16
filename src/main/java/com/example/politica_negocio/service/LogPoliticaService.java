@@ -76,8 +76,22 @@ public class LogPoliticaService {
                 .max()
                 .orElse(0) + 1;
 
+        Map<String, List<String>> incomingByTarget = buildIncomingIndex(outgoingBySource);
+
         Map<String, Object> flujoJson = buildFlujoJson(
-                politicaId, inicio.getId(), nextVersion, reachable, actividadById, outgoingBySource, formularioByActividad);
+                politicaId, inicio.getId(), nextVersion, reachable, actividadById, outgoingBySource,
+                incomingByTarget, formularioByActividad);
+
+        Optional<LogPolitica> prevValido = getUltimoValido(politicaId);
+        if (prevValido.isPresent()
+                && flujoJsonSemanticallyEqual(prevValido.get().getFlujoJson(), flujoJson)) {
+            return LogPoliticaCompileResult.builder()
+                    .valido(true)
+                    .version(prevValido.get().getVersion())
+                    .mensaje("Flujo sin cambios estructurales")
+                    .flujoJson(prevValido.get().getFlujoJson())
+                    .build();
+        }
 
         deactivatePreviousFunctionalVersions(politicaId, "Reemplazado por versión " + nextVersion);
 
@@ -197,6 +211,12 @@ public class LogPoliticaService {
                 if (edges.size() != 2) {
                     return "La decisión '" + act.getNombre() + "' debe tener exactamente 2 conexiones (Sí/No)";
                 }
+                long finBranches = edges.stream()
+                        .filter(e -> isFinNode(e.targetId, actividadById))
+                        .count();
+                if (finBranches == 2) {
+                    return "La decisión '" + act.getNombre() + "' no puede tener ambas ramas hacia Fin";
+                }
                 boolean missingLabel = edges.stream().anyMatch(e -> e.label == null || e.label.isBlank());
                 if (missingLabel) {
                     return "La decisión '" + act.getNombre() + "' requiere etiqueta en cada rama";
@@ -207,6 +227,21 @@ public class LogPoliticaService {
                         return "La rama '" + edge.label + "' de la decisión '" + act.getNombre()
                                 + "' no termina en Fin";
                     }
+                }
+            }
+
+            if ("actividad".equals(uiTipo) && edges.size() >= 2) {
+                boolean anyFin = edges.stream().anyMatch(e -> isFinNode(e.targetId, actividadById));
+                if (anyFin) {
+                    return "Las conexiones paralelas desde '" + act.getNombre()
+                            + "' no pueden terminar directamente en Fin";
+                }
+            }
+
+            if ("inicio".equals(uiTipo) && edges.size() >= 2) {
+                boolean anyFin = edges.stream().anyMatch(e -> isFinNode(e.targetId, actividadById));
+                if (anyFin) {
+                    return "Las conexiones paralelas desde Inicio no pueden terminar directamente en Fin";
                 }
             }
 
@@ -237,6 +272,70 @@ public class LogPoliticaService {
             return "No todas las ramas del flujo terminan en un nodo Fin";
         }
 
+        String cycleError = validateNoCyclesWithoutPregunta(
+                inicioId, actividadById, outgoingBySource, reachableFromInicio);
+        if (cycleError != null) {
+            return cycleError;
+        }
+
+        return null;
+    }
+
+    private String validateNoCyclesWithoutPregunta(
+            String startId,
+            Map<String, Actividad> actividadById,
+            Map<String, List<EdgeRef>> outgoingBySource,
+            Set<String> reachable) {
+
+        Set<String> visited = new HashSet<>();
+        Set<String> stack = new HashSet<>();
+        List<String> path = new ArrayList<>();
+
+        for (String nodeId : reachable) {
+            if (!visited.contains(nodeId)) {
+                String err = dfsCycleCheck(nodeId, actividadById, outgoingBySource, visited, stack, path);
+                if (err != null) return err;
+            }
+        }
+        return null;
+    }
+
+    private String dfsCycleCheck(
+            String nodeId,
+            Map<String, Actividad> actividadById,
+            Map<String, List<EdgeRef>> outgoingBySource,
+            Set<String> visited,
+            Set<String> stack,
+            List<String> path) {
+
+        visited.add(nodeId);
+        stack.add(nodeId);
+        path.add(nodeId);
+
+        for (EdgeRef edge : outgoingBySource.getOrDefault(nodeId, List.of())) {
+            String next = edge.targetId;
+            if (!stack.contains(next)) {
+                if (!visited.contains(next)) {
+                    String err = dfsCycleCheck(next, actividadById, outgoingBySource, visited, stack, path);
+                    if (err != null) return err;
+                }
+            } else {
+                int cycleStart = path.indexOf(next);
+                if (cycleStart >= 0) {
+                    List<String> cycle = path.subList(cycleStart, path.size());
+                    boolean hasPregunta = cycle.stream().anyMatch(id -> {
+                        Actividad a = actividadById.get(id);
+                        return a != null && "pregunta".equals(normalizeStoredTipo(a.getTipoNodo()));
+                    });
+                    if (!hasPregunta) {
+                        return "Para volver a una actividad anterior use un nodo Pregunta (while/do-while)";
+                    }
+                }
+            }
+        }
+
+        stack.remove(nodeId);
+        path.remove(path.size() - 1);
         return null;
     }
 
@@ -299,6 +398,81 @@ public class LogPoliticaService {
         return map;
     }
 
+    private Map<String, List<String>> buildIncomingIndex(Map<String, List<EdgeRef>> outgoingBySource) {
+        Map<String, List<String>> incoming = new HashMap<>();
+        for (Map.Entry<String, List<EdgeRef>> entry : outgoingBySource.entrySet()) {
+            for (EdgeRef edge : entry.getValue()) {
+                incoming.computeIfAbsent(edge.targetId, k -> new ArrayList<>()).add(entry.getKey());
+            }
+        }
+        return incoming;
+    }
+
+    private boolean flujoJsonSemanticallyEqual(Map<String, Object> a, Map<String, Object> b) {
+        if (a == null || b == null) return false;
+        return normalizeFlujoJsonForCompare(a).equals(normalizeFlujoJsonForCompare(b));
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> normalizeFlujoJsonForCompare(Map<String, Object> json) {
+        Map<String, Object> copy = new LinkedHashMap<>(json);
+        copy.remove("version");
+        Object nodosObj = copy.get("nodos");
+        if (nodosObj instanceof List<?> list) {
+            List<Map<String, Object>> sorted = list.stream()
+                    .filter(item -> item instanceof Map<?, ?>)
+                    .map(item -> new LinkedHashMap<String, Object>((Map<String, Object>) item))
+                    .sorted(Comparator.comparing(m -> String.valueOf(m.get("nodoId"))))
+                    .collect(Collectors.toCollection(ArrayList::new));
+            copy.put("nodos", sorted);
+        }
+        return copy;
+    }
+
+    private boolean canReach(
+            String fromId,
+            String toId,
+            Map<String, List<EdgeRef>> outgoingBySource) {
+        if (fromId.equals(toId)) return true;
+        Set<String> visited = new HashSet<>();
+        Deque<String> queue = new ArrayDeque<>();
+        queue.add(fromId);
+        while (!queue.isEmpty()) {
+            String id = queue.poll();
+            if (!visited.add(id)) continue;
+            if (id.equals(toId)) return true;
+            for (EdgeRef e : outgoingBySource.getOrDefault(id, List.of())) {
+                queue.add(e.targetId);
+            }
+        }
+        return false;
+    }
+
+    private String inferRetornoActividadId(
+            String preguntaId,
+            List<EdgeRef> edges,
+            Map<String, List<String>> incomingByTarget,
+            Map<String, Actividad> actividadById,
+            Map<String, List<EdgeRef>> outgoingBySource) {
+
+        Set<String> bodyEntryTargets = edges.stream()
+                .filter(e -> !isFinNode(e.targetId, actividadById))
+                .filter(e -> canReach(e.targetId, preguntaId, outgoingBySource))
+                .map(e -> e.targetId)
+                .collect(Collectors.toSet());
+
+        for (String pred : incomingByTarget.getOrDefault(preguntaId, List.of())) {
+            if (bodyEntryTargets.contains(pred)) continue;
+            Actividad predAct = actividadById.get(pred);
+            if (predAct == null) continue;
+            String predTipo = normalizeStoredTipo(predAct.getTipoNodo());
+            if ("actividad".equals(predTipo)) {
+                return pred;
+            }
+        }
+        return null;
+    }
+
     private Map<String, Object> buildFlujoJson(
             String politicaId,
             String inicioNodoId,
@@ -306,6 +480,7 @@ public class LogPoliticaService {
             Set<String> reachable,
             Map<String, Actividad> actividadById,
             Map<String, List<EdgeRef>> outgoingBySource,
+            Map<String, List<String>> incomingByTarget,
             Map<String, String> formularioByActividad) {
 
         List<Map<String, Object>> nodos = new ArrayList<>();
@@ -343,6 +518,14 @@ public class LogPoliticaService {
                         ? String.valueOf(meta.get("iterativoTipo"))
                         : "while_do";
                 nodo.put("iterativoTipo", iterativo);
+                List<EdgeRef> preguntaEdges = outgoingBySource.getOrDefault(nodeId, List.of());
+                String retorno = meta.get("retornoActividadId") != null
+                        ? String.valueOf(meta.get("retornoActividadId"))
+                        : inferRetornoActividadId(nodeId, preguntaEdges, incomingByTarget,
+                                actividadById, outgoingBySource);
+                if (retorno != null && !retorno.isBlank()) {
+                    nodo.put("retornoActividadId", retorno);
+                }
             }
 
             if (!"fin".equals(uiTipo)) {

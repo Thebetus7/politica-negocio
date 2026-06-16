@@ -2,10 +2,8 @@ package com.example.politica_negocio.seeder;
 
 import com.example.politica_negocio.model.Role;
 import com.example.politica_negocio.model.Departamento;
-import com.example.politica_negocio.model.FuncionarioDepa;
 import com.example.politica_negocio.model.Usuario;
 import com.example.politica_negocio.repository.DepartamentoRepository;
-import com.example.politica_negocio.repository.FuncionarioDepaRepository;
 import com.example.politica_negocio.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -21,7 +19,6 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     private final UsuarioRepository usuarioRepository;
     private final DepartamentoRepository departamentoRepository;
-    private final FuncionarioDepaRepository funcionarioDepaRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -31,10 +28,9 @@ public class DatabaseSeeder implements CommandLineRunner {
         }
         if (usuarioRepository.count() == 0) {
             seedAdministrador();
-            List<Usuario> funcionarios = seedFuncionarios();
             seedAtencionCliente();
-            seedFuncionarioDepa(funcionarios);
-            System.out.println("Base de datos poblada exitosamente con usuarios y asignaciones por defecto.");
+            System.out.println("Base de datos poblada: admin, atención al cliente y departamentos.");
+            System.out.println("Los funcionarios se crean manualmente en gestión de usuarios y se asignan a departamentos.");
         }
     }
 
@@ -67,20 +63,6 @@ public class DatabaseSeeder implements CommandLineRunner {
         usuarioRepository.save(admin);
     }
 
-    private List<Usuario> seedFuncionarios() {
-        java.util.ArrayList<Usuario> funcionarios = new java.util.ArrayList<>();
-        for (int i = 1; i <= 2; i++) {
-            Usuario funcionario = new Usuario();
-            funcionario.setNombre("Funcionario " + i);
-            funcionario.setCorreo("funcionario" + i + "@example.com");
-            funcionario.setPassword(passwordEncoder.encode("password"));
-            funcionario.setRol(Role.FUNCIONARIO);
-            funcionario.setCreatedAt(LocalDateTime.now());
-            funcionarios.add(usuarioRepository.save(funcionario));
-        }
-        return funcionarios;
-    }
-
     private void seedAtencionCliente() {
         for (int i = 1; i <= 2; i++) {
             Usuario atencion = new Usuario();
@@ -90,24 +72,6 @@ public class DatabaseSeeder implements CommandLineRunner {
             atencion.setRol(Role.ATENCION_CLIENTE);
             atencion.setCreatedAt(LocalDateTime.now());
             usuarioRepository.save(atencion);
-        }
-    }
-
-    private void seedFuncionarioDepa(List<Usuario> funcionarios) {
-        List<Departamento> departamentos = departamentoRepository.findAllActive();
-        if (departamentos.isEmpty()) {
-            return;
-        }
-
-        for (int i = 0; i < funcionarios.size(); i++) {
-            Usuario funcionario = funcionarios.get(i);
-            Departamento depa = departamentos.get(i % departamentos.size());
-
-            FuncionarioDepa asignacion = new FuncionarioDepa();
-            asignacion.setUserId(funcionario.getId());
-            asignacion.setDepartamentoId(depa.getId());
-            asignacion.setCreatedAt(LocalDateTime.now());
-            funcionarioDepaRepository.save(asignacion);
         }
     }
 }

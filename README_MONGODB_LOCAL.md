@@ -198,11 +198,11 @@ El seeder (`DatabaseSeeder.java`) solo inserta datos si las colecciones están v
 
 | Rol           | Correo                     | Contraseña |
 | ------------- | -------------------------- | ---------- |
-| Administrador | `admin@example.com`        | `admin123` |
-| Funcionario 1 | `funcionario1@example.com` | `password` |
-| Funcionario 2 | `funcionario2@example.com` | `password` |
-| Atención 1    | `atencion1@example.com`    | `password` |
-| Atención 2    | `atencion2@example.com`    | `password` |
+| Administrador | `admin@example.com`     | `admin123` |
+| Atención 1    | `atencion1@example.com` | `password` |
+| Atención 2    | `atencion2@example.com` | `password` |
+
+Los funcionarios se crean manualmente desde el panel admin y se asignan a departamentos.
 
 
 Las contraseñas se guardan hasheadas con BCrypt; en Compass o mongosh verás valores como `$2a$10$...`, no el texto plano.
@@ -339,7 +339,7 @@ Prueba login con `admin@example.com` / `admin123`.
 | Al hacer `dropDatabase()`              | Tras reiniciar Spring (`DatabaseSeeder`)     |
 | -------------------------------------- | -------------------------------------------- |
 | Todas las colecciones de `politica_db` | 3 departamentos                              |
-| Políticas, diagramas y datos de prueba | 5 usuarios + asignaciones `funcionariosDepa` |
+| Políticas, diagramas y datos de prueba | 3 usuarios (admin + 2 atención ciudadana) |
 
 
 Colecciones como `politicasNegocio` quedan vacías hasta que uses la app.
