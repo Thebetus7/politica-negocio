@@ -84,7 +84,21 @@ sudo systemctl enable mongod
 sudo systemctl start mongod
 ```
 
-## 4. Compilar el Proyecto (En tu PC Local - PowerShell)
+## 4. Configurar CORS y Compilar el Proyecto (En tu PC Local)
+
+⚠️ **¡IMPORTANTE ANTES DE COMPILAR!** 
+Para que tu frontend en producción (Angular) pueda comunicarse con este backend sin recibir el error de CORS (`0 Unknown Error`), debes configurar los permisos de origen.
+1. Abre el archivo `src/main/java/com/example/politica_negocio/config/security/SecurityConfig.java`.
+2. Busca el método `setAllowedOriginPatterns` y asegúrate de agregar `"*"` (o la IP pública de tu frontend) a la lista:
+   ```java
+   configuration.setAllowedOriginPatterns(java.util.List.of(
+           "http://localhost:4201",
+           "http://localhost:4200",
+           "*" // <- ¡Permite peticiones desde la nube!
+   ));
+   ```
+   *(Guarda el archivo antes de continuar).*
+
 Abre **otra ventana** de terminal (PowerShell) en tu computadora local, navega a la carpeta `politica-negocio` y compila tu código Java:
 ```powershell
 # Se ejecuta en PowerShell (Local). Usamos mvnw.cmd porque estás en Windows.

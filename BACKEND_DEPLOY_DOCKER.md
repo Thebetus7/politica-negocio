@@ -78,8 +78,22 @@ sudo chmod +x /usr/local/bin/docker-compose
 ```
 *(Importante: Tras el comando `usermod`, debes escribir `exit` para salir del servidor y volver a entrar con el comando `ssh` para que el permiso del grupo `docker` se aplique).*
 
-## 4. Preparar los archivos (En tu PC Local - Editor de Código / IDE)
-Abre tu proyecto localmente y crea dos archivos fundamentales.
+## 4. Preparar Código y Archivos (En tu PC Local - Editor de Código / IDE)
+
+⚠️ **¡IMPORTANTE ANTES DE CONTINUAR! (Configurar CORS)** 
+Para que tu frontend en producción pueda comunicarse con este backend sin recibir el error de CORS (`0 Unknown Error`), debes configurar los permisos de origen.
+1. Abre el archivo `src/main/java/com/example/politica_negocio/config/security/SecurityConfig.java`.
+2. Busca el método `setAllowedOriginPatterns` y asegúrate de agregar `"*"` (o la IP pública de tu frontend) a la lista:
+   ```java
+   configuration.setAllowedOriginPatterns(java.util.List.of(
+           "http://localhost:4201",
+           "http://localhost:4200",
+           "*" // <- ¡Permite peticiones desde la nube!
+   ));
+   ```
+   *(Guarda el archivo antes de continuar).*
+
+Ahora, abre tu proyecto localmente y crea dos archivos fundamentales para orquestar Docker.
 
 En `politica-negocio`, creas un **`Dockerfile`**:
 ```dockerfile

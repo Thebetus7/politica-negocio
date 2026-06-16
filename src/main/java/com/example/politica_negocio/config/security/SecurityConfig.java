@@ -89,7 +89,8 @@ public class SecurityConfig {
                 "http://localhost:4201", 
                 "http://localhost:4200",
                 "http://127.0.0.1:4201",
-                "http://127.0.0.1:4200"
+                "http://127.0.0.1:4200",
+                "*" // Permitir peticiones desde cualquier IP de producción
         ));
         configuration.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
         configuration.setAllowedHeaders(java.util.List.of("*"));
