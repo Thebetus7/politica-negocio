@@ -85,8 +85,7 @@ public class WorkflowBranchService {
         }
         return result;
     }
-
-    @SuppressWarnings("unchecked")
+    
     private List<Map<String, String>> extractDestinosFromNodo(Map<String, Object> nodo) {
         List<Map<String, String>> destinos = new ArrayList<>();
         Object sigObj = nodo.get("siguiente");

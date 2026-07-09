@@ -1,6 +1,5 @@
 package com.example.politica_negocio.service;
 
-import com.example.politica_negocio.model.LogPolitica;
 import com.example.politica_negocio.model.Portafolio;
 import com.example.politica_negocio.model.Flujo;
 import com.example.politica_negocio.repository.FlujoRepository;
@@ -21,7 +20,6 @@ public class PortafolioService {
 
     private final PortafolioRepository repository;
     private final FlujoRepository flujoRepository;
-    private final LogPoliticaService logPoliticaService;
     private final TramiteEngineService tramiteEngineService;
 
     public List<Portafolio> getAll() {
@@ -36,11 +34,6 @@ public class PortafolioService {
         if (portafolio.getPoliticaId() == null || portafolio.getPoliticaId().isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "politicaId es requerido");
         }
-
-        LogPolitica valido = logPoliticaService.getUltimoValido(portafolio.getPoliticaId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT,
-                        "La política no tiene un flujo válido compilado. Guarde el diagrama primero."));
-
         portafolio.setCreatedAt(LocalDateTime.now());
         if (portafolio.getEstado() == null) {
             portafolio.setEstado("en_progreso");
