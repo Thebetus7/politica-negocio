@@ -3,11 +3,15 @@ package com.example.politica_negocio.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.CommandLineRunner;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3Configuration;
+import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
+import software.amazon.awssdk.services.s3.model.HeadBucketRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
 import java.net.URI;
 
@@ -30,5 +34,26 @@ public class S3Config {
                         .pathStyleAccessEnabled(true)
                         .build())
                 .build();
+    }
+
+    @Bean
+    public CommandLineRunner initBucket(
+            S3Client s3Client,
+            @Value("${storage.s3.bucket}") String bucketName) {
+        return args -> {
+            try {
+                s3Client.headBucket(HeadBucketRequest.builder().bucket(bucketName).build());
+                System.out.println("El bucket de MinIO/S3 '" + bucketName + "' ya existe.");
+            } catch (S3Exception e) {
+                if (e.statusCode() == 404) {
+                    s3Client.createBucket(CreateBucketRequest.builder().bucket(bucketName).build());
+                    System.out.println("Bucket de MinIO/S3 creado exitosamente: " + bucketName);
+                } else {
+                    System.err.println("Error verificando bucket de S3: " + e.getMessage());
+                }
+            } catch (Exception e) {
+                System.err.println("No se pudo inicializar o conectar a MinIO al arrancar: " + e.getMessage());
+            }
+        };
     }
 }

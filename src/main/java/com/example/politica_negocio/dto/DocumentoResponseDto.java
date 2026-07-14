@@ -11,4 +11,10 @@ public class DocumentoResponseDto {
     private String mimeType;
     private Long size;
     private String downloadUrl;
+    private String estado;
+    private int versionActual;
+    private String contenidoTexto;
+    private String politicaId;
+    private String actividadId;
+    private String portafolioId;
 }

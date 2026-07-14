@@ -1,7 +1,8 @@
+name: minio-politica-negocio-s3
 services:
   minio:
     image: minio/minio:latest
-    container_name: politica-minio
+    container_name: politica-negocio
     ports:
       - "9000:9000"
       - "9001:9001"

@@ -75,6 +75,20 @@
 			<version>2.29.45</version>
 		</dependency>
 
+		<!-- Apache PDFBox para extraer texto de PDFs -->
+		<dependency>
+			<groupId>org.apache.pdfbox</groupId>
+			<artifactId>pdfbox</artifactId>
+			<version>2.0.31</version>
+		</dependency>
+
+		<!-- Apache POI para extraer texto de Word y Excel -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>5.2.5</version>
+		</dependency>
+
 		<!-- Lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>

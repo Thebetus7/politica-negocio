@@ -63,6 +63,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/health").permitAll()
                 .requestMatchers("/api/politicas/public").permitAll()
+                .requestMatchers("/error").permitAll()
                 .requestMatchers("/ws-diagram/**").permitAll()
                 .requestMatchers("/ws-native/**").permitAll()
                 .anyRequest().authenticated()

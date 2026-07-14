@@ -11,4 +11,12 @@ public interface DocumentoRepository extends MongoRepository<Documento, String> 
     Optional<Documento> findByIdAndDeletedAtIsNull(String id);
 
     List<Documento> findByPortafolioIdAndDeletedAtIsNull(String portafolioId);
+
+    List<Documento> findByDeletedAtIsNullOrderByCreatedAtDesc();
+
+    List<Documento> findByDeletedAtIsNullOrderByCreatedAtAsc();
+
+    List<Documento> findByPoliticaIdAndDeletedAtIsNullOrderByCreatedAtDesc(String politicaId);
+
+    List<Documento> findByPoliticaIdAndEstadoAndDeletedAtIsNullOrderByCreatedAtDesc(String politicaId, String estado);
 }

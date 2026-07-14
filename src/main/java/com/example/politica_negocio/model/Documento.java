@@ -23,4 +23,9 @@ public class Documento extends BaseEntity {
     private String portafolioId;
     private String formUpdateId;
     private String subidoPor;
+
+    private String estado = "PENDIENTE";
+    private int versionActual = 1;
+    private String contenidoTexto;
+    private String politicaId;
 }
