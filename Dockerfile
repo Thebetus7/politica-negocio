@@ -1,5 +1,5 @@
 # --- ETAPA 1: Construcción ---
-FROM maven:3.8.5-openjdk-17-slim AS build
+FROM maven:3.9-eclipse-temurin-17-alpine AS build
 WORKDIR /app
 
 # Copiar el archivo pom.xml y descargar las dependencias para guardarlas en la caché de Docker
@@ -11,7 +11,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # --- ETAPA 2: Ejecución ---
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 
 # Copiar el archivo JAR construido en la etapa anterior (asegurar que el nombre coincida con el pom.xml)

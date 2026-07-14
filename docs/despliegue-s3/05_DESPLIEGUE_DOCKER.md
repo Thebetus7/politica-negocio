@@ -28,7 +28,7 @@ Asegúrate de que los archivos `Dockerfile` y `docker-compose.yml` estén creado
 ### 📄 `Dockerfile`
 ```dockerfile
 # --- ETAPA 1: Construcción ---
-FROM maven:3.8.5-openjdk-17-slim AS build
+FROM maven:3.9-eclipse-temurin-17-alpine AS build
 WORKDIR /app
 
 # Copiar el archivo pom.xml y descargar las dependencias para guardarlas en la caché de Docker
@@ -40,7 +40,8 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # --- ETAPA 2: Ejecución ---
-FROM openjdk:17-jdk-slim
+# Imagen eclipse-temurin: reemplaza a openjdk que fue DEPRECADA y removida de Docker Hub
+FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 
 # Copiar el archivo JAR construido en la etapa anterior (asegurar que el nombre coincida con el pom.xml)
@@ -93,12 +94,24 @@ services:
       
       # Credenciales de acceso programático de AWS (Obtenidas en el Paso 1)
       # Las encuentras en el archivo credentials.csv descargado al crear el usuario IAM
+      # ⚠️ NUNCA escribas las claves reales aquí si este archivo está en tu repositorio Git
       - AWS_S3_ACCESS_KEY=TU_AWS_ACCESS_KEY_ID
       - AWS_S3_SECRET_KEY=TU_AWS_SECRET_ACCESS_KEY
 
 volumes:
   mongodb_data:
 ```
+
+> [!CAUTION]
+> **Seguridad de Credenciales:** NUNCA escribas las claves de AWS (`ACCESS_KEY` y `SECRET_KEY`) directamente en el `docker-compose.yml` si ese archivo está versionado en Git. Si ya lo hiciste y hiciste `git push`, **las credenciales están expuestas** y debes:
+> 1. Ir inmediatamente a la consola de **AWS IAM → Users → `politica-negocio-s3-user` → Security credentials** y hacer clic en **Deactivate** en la Access Key expuesta, luego eliminarla.
+> 2. Crear una nueva Access Key.
+> 3. Para el servidor de EC2, lo más seguro es exportar las variables directamente en la terminal **antes** de correr el compose:
+>    ```bash
+>    export AWS_S3_ACCESS_KEY=TU_NUEVA_ACCESS_KEY
+>    export AWS_S3_SECRET_KEY=TU_NUEVA_SECRET_KEY
+>    docker-compose up -d --build
+>    ```
 
 ---
 
