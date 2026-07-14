@@ -25,15 +25,20 @@ public class S3Config {
             @Value("${storage.s3.access-key}") String accessKey,
             @Value("${storage.s3.secret-key}") String secretKey) {
 
-        return S3Client.builder()
-                .endpointOverride(URI.create(endpoint))
+        software.amazon.awssdk.services.s3.S3ClientBuilder builder = S3Client.builder()
                 .region(Region.of(region))
                 .credentialsProvider(StaticCredentialsProvider.create(
-                        AwsBasicCredentials.create(accessKey, secretKey)))
-                .serviceConfiguration(S3Configuration.builder()
-                        .pathStyleAccessEnabled(true)
-                        .build())
-                .build();
+                        AwsBasicCredentials.create(accessKey, secretKey)));
+
+        // Configurar endpoint override y path style únicamente si es desarrollo local (MinIO)
+        if (endpoint.contains("localhost") || endpoint.contains("127.0.0.1") || endpoint.contains("minio")) {
+            builder.endpointOverride(URI.create(endpoint))
+                   .serviceConfiguration(S3Configuration.builder()
+                           .pathStyleAccessEnabled(true)
+                           .build());
+        }
+
+        return builder.build();
     }
 
     @Bean

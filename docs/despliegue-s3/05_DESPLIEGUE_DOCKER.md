@@ -6,6 +6,7 @@ Una vez que configuraste tu instancia EC2 e instalaste las herramientas (Git, Do
 
 ## 5.1 — Descargar el Código en el Servidor (EC2)
 
+### A) Si es el Primer Despliegue (Clonar por primera vez)
 1. Conéctate a tu servidor EC2 por SSH desde tu terminal local (como se explicó en el Paso 4):
    ```bash
    ssh -i politica-backend-key.pem ec2-user@TU_IP_PUBLICA_EC2
@@ -17,6 +18,28 @@ Una vez que configuraste tu instancia EC2 e instalaste las herramientas (Git, Do
 3. Entra a la carpeta del backend donde se encuentran el `Dockerfile` y el `docker-compose.yml`:
    ```bash
    cd politica-negocio-backend/politica-negocio
+   ```
+
+### B) Si estás Actualizando el Código (Traer cambios nuevos)
+Si ya realizaste el despliegue inicial y modificaste el código de tu aplicación en tu PC local:
+1. Sube los cambios de tu PC a GitHub:
+   ```bash
+   git add .
+   git commit -m "Descripción de los cambios"
+   git push origin main
+   ```
+2. Conéctate por SSH a la EC2.
+3. Dirígete a la carpeta del backend en el servidor:
+   ```bash
+   cd ~/politica-negocio-backend/politica-negocio
+   ```
+4. Descarga el código actualizado de Git:
+   ```bash
+   git pull origin main
+   ```
+5. Reconstruye y levanta la aplicación con el código nuevo (se compilará automáticamente en el build del Dockerfile):
+   ```bash
+   docker-compose up -d --build
    ```
 
 ---
