@@ -1,10 +1,10 @@
-# Despliegue del Proyecto en AWS con S3 — Resumen General
+# Despliegue del Backend (Spring Boot + MongoDB) en AWS con S3 — Resumen General
 
-Esta guía detalla paso a paso cómo desplegar el frontend de **Angular** en **AWS S3** como un sitio web estático y cómo configurar el backend de **Spring Boot** para utilizar un bucket de **AWS S3** en producción, reemplazando el contenedor de MinIO que se utiliza en el entorno de desarrollo local.
+Esta guía detalla paso a paso cómo configurar y desplegar el backend de **Spring Boot** en AWS utilizando un bucket de **AWS S3** privado para el almacenamiento de archivos (en reemplazo del contenedor de MinIO de desarrollo local) y cómo orquestar el backend y la base de datos **MongoDB** en una máquina virtual **AWS EC2** mediante **Docker**.
 
 ---
 
-## 📋 Flujo General de Despliegue con S3
+## 📋 Flujo General de Despliegue
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -14,17 +14,17 @@ Esta guía detalla paso a paso cómo desplegar el frontend de **Angular** en **A
 │ 2. CONFIGURAR ALMACENAMIENTO BACKEND (SPRING BOOT)                  │
 │    Crear bucket de S3 privado, CORS y configurar property/env       │
 │                              ↓                                      │
-│ 3. DESPLEGAR EL FRONTEND (ANGULAR) EN S3                            │
-│    Compilar la SPA, crear bucket público y habilitar Web Hosting    │
+│ 3. CREAR INSTANCIA EC2                                              │
+│    Configurar e iniciar la máquina virtual en AWS                   │
 │                              ↓                                      │
-│ 4. CONFIGURAR DISTRIBUCIÓN CLOUDFRONT                               │
-│    Habilitar HTTPS (SSL/TLS) y resolver el enrutamiento SPA (404s)  │
+│ 4. INSTALAR HERRAMIENTAS EN EL SERVIDOR                             │
+│    Conectarse por SSH, instalar Git, Docker, Buildx y Compose       │
 │                              ↓                                      │
-│ 5. APAGAR Y LIMPIAR SERVICIOS (Evitar facturación)                  │
-│    Vaciar buckets, eliminar recursos de AWS y desactivar políticas  │
+│ 5. SUBIR CÓDIGO Y DESPLEGAR CON DOCKER                              │
+│    Clonar el proyecto, levantar contenedores y verificar logs       │
 │                              ↓                                      │
-│ 6. DESPLEGAR BACKEND Y MONGODB CON DOCKER                           │
-│    Dockerfile, docker-compose y orquestación completa               │
+│ 6. MANTENIMIENTO Y APAGADO DE RECURSOS                              │
+│    Apagar la EC2, vaciar/eliminar bucket S3 y limpiar credenciales  │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -34,13 +34,13 @@ Esta guía detalla paso a paso cómo desplegar el frontend de **Angular** en **A
 
 | Archivo | Contenido |
 |---|---|
-| `00_RESUMEN_GENERAL.md` | **Este archivo.** Flujo general, arquitectura de S3 y estructura de la documentación. |
+| `00_RESUMEN_GENERAL.md` | **Este archivo.** Flujo general de despliegue y estructura de la documentación del backend. |
 | `01_CREACION_IAM.md` | Creación de credenciales y asignación de políticas de acceso seguro en AWS IAM. |
 | `02_S3_ALMACENAMIENTO_BACKEND.md` | Crear el bucket privado, configurar CORS e integrar Spring Boot con AWS S3 en producción. |
-| `03_S3_HOSTING_FRONTEND.md` | Crear bucket público, habilitar Static Website Hosting y subir la aplicación de Angular. |
-| `04_AWS_CLOUDFRONT.md` | Configurar CloudFront para asegurar el frontend con HTTPS y corregir el redireccionamiento SPA. |
-| `05_MANTENIMIENTO_Y_APAGADO.md` | Procedimientos para limpiar buckets y desactivar recursos para evitar cargos de facturación. |
-| `06_DESPLIEGUE_DOCKER.md` | Creación de Dockerfile y docker-compose para orquestar Spring Boot y MongoDB. |
+| `03_CREAR_INSTANCIA_EC2.md` | Creación y configuración de la máquina virtual (EC2) y las reglas del firewall. |
+| `04_INSTALAR_HERRAMIENTAS.md` | Pasos para conectarse por SSH e instalar Docker, Git y Docker Compose en la EC2. |
+| `05_DESPLIEGUE_DOCKER.md` | Clonar el repositorio en el servidor, configurar variables y levantar Spring Boot y MongoDB. |
+| `06_MANTENIMIENTO_Y_APAGADO.md` | Detener/terminar la EC2, vaciar el bucket y eliminar recursos de AWS para evitar cobros. |
 
 ---
 

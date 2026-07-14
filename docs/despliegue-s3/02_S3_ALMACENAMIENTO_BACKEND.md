@@ -93,7 +93,7 @@ La mejor práctica es mantener el archivo [application.properties](file:///c:/ED
 1. **Modifica tu `application.properties` para soportar variables de entorno:**
 ```properties
 storage.s3.endpoint=${AWS_S3_ENDPOINT:http://localhost:9000}
-storage.s3.region=${AWS_S3_REGION:us-east-1}
+storage.s3.region=${AWS_S3_REGION:us-east-2}
 storage.s3.bucket=${AWS_S3_BUCKET:politica-docs}
 storage.s3.access-key=${AWS_S3_ACCESS_KEY:minio}
 storage.s3.secret-key=${AWS_S3_SECRET_KEY:minio12345}
@@ -105,7 +105,7 @@ Si corres tu backend en una instancia EC2 de Linux, puedes exportarlas en el per
 
 ```bash
 export AWS_S3_ENDPOINT=https://s3.us-east-1.amazonaws.com
-export AWS_S3_REGION=us-east-1
+export AWS_S3_REGION=us-east-2
 export AWS_S3_BUCKET=politica-docs-prod
 export AWS_S3_ACCESS_KEY=TU_AWS_ACCESS_KEY_ID
 export AWS_S3_SECRET_KEY=TU_AWS_SECRET_ACCESS_KEY
@@ -129,5 +129,7 @@ services:
 
 ---
 
-> **Siguiente paso:** [03_S3_HOSTING_FRONTEND.md](./03_S3_HOSTING_FRONTEND.md)  
+> **Siguiente paso:** [03_CREAR_INSTANCIA_EC2.md](./03_CREAR_INSTANCIA_EC2.md)  
+
+
 > **Volver al índice:** [00_RESUMEN_GENERAL.md](./00_RESUMEN_GENERAL.md)
